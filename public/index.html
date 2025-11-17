@@ -1,0 +1,1043 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EventHub Demo</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <h1>EventHub Demo</h1>
+
+  
+
+  <section id="sectionAccount">
+    <h2>Account</h2>
+    <div>
+      <input id="acctEmail" placeholder="email" value="owner@example.com" />
+      <input id="acctName" placeholder="nome" value="Owner" />
+      <input id="acctPassword" placeholder="password" value="password123" />
+      <button id="acctSignupBtn">Signup</button>
+      <button id="acctLoginBtn">Login</button>
+      <button id="acctLogoutBtn">Logout</button>
+    </div>
+    <div>
+      <span id="acctStatus">non loggato</span>
+    </div>
+    <div class="mb8">
+      <input id="googleIdToken" placeholder="Google ID token" />
+      <button id="googleLoginBtn">Login con Google</button>
+    </div>
+    <div class="mb8">
+      <input id="githubCode" placeholder="GitHub code" />
+      <input id="githubAccessToken" placeholder="GitHub access token" />
+      <button id="githubLoginBtn">Login con GitHub</button>
+    </div>
+    <div class="mb8"><span id="emailVerifiedLabel">Email verificata: n/d</span></div>
+  </section>
+
+  <section id="sectionOwner">
+    <h2>Owner</h2>
+    <div class="mb8">
+      <h3>Crea Evento</h3>
+      <input id="eventTitle" placeholder="Titolo" value="Demo Event" />
+      <input id="eventCity" placeholder="Città" value="Torino" />
+      <input id="eventDescription" placeholder="Descrizione" value="Demo" />
+      <input id="eventCategory" placeholder="Categoria" value="demo" />
+      <input id="eventCapacity" type="number" min="1" step="1" placeholder="Capienza" />
+      <input id="eventStartsAt" type="datetime-local" placeholder="Inizio" />
+      <input id="eventEndsAt" type="datetime-local" placeholder="Fine (opzionale)" />
+      <input id="eventImageUrl" type="url" placeholder="Immagine URL (opzionale)" />
+      <button id="createEventBtn">Crea Evento</button>
+      <span id="createdEventId"></span>
+    </div>
+    <div class="mb8">
+      <h3>Notifiche</h3>
+      <button id="subscribeOwnerBtn">Sottoscrivi Notifiche Owner</button>
+      <button id="unsubscribeOwnerSseBtn">Disiscrivi</button>
+      <span class="status"><span id="ownerSseDot" class="dot"></span> <span id="ownerSseText">offline</span> <span class="badge" id="ownerSseRetry"></span></span>
+      <div class="row mb8">
+        <button id="listNotificationsBtn">Lista Notifiche</button>
+        <span class="badge">Non lette: <span id="notifCount">0</span></span>
+        <button id="markAllReadBtn">Segna tutte come lette</button>
+      </div>
+    </div>
+    <div class="mb8">
+      <h3>Messaggi Evento</h3>
+      <input id="ownerEventIdInput" placeholder="Event ID (owner)" />
+      <button id="ownerLoadMessagesBtn">Carica Messaggi Owner</button>
+      <ul id="ownerMessagesList" class="messages"></ul>
+    </div>
+  </section>
+
+  <section id="sectionReset">
+    <h2>Reset Password</h2>
+    <div class="row mb8">
+      <input id="resetEmail" placeholder="email" />
+      <button id="resetRequestBtn">Richiedi Reset</button>
+    </div>
+    <div class="row mb8">
+      <input id="resetToken" placeholder="token" />
+      <input id="resetNewPassword" placeholder="nuova password" />
+      <button id="resetConfirmBtn">Conferma Reset</button>
+    </div>
+  </section>
+
+  <section id="sectionCatalog">
+    <h2>Catalogo</h2>
+    <div class="row mb8">
+      <button id="catalogSearchBtn">Cerca Eventi</button>
+      <input id="catalogQ" placeholder="Testo" />
+      <input id="catalogCategory" placeholder="Categoria" />
+      <input id="catalogCity" placeholder="Città" />
+      <input id="catalogDateFrom" placeholder="Da (ms)" />
+      <input id="catalogDateTo" placeholder="A (ms)" />
+    </div>
+    <div>
+      <ul id="catalogList" class="messages"></ul>
+    </div>
+  </section>
+
+  <section id="sectionDashboard">
+    <h2>Dashboard</h2>
+    <div class="row mb8">
+      <button id="loadMineBtn">I miei eventi</button>
+      <button id="loadSubscribedBtn">Eventi iscritti</button>
+    </div>
+    <div class="row mb8">
+      <label for="sseMaxRetries">Max tentativi SSE</label>
+      <select id="sseMaxRetries">
+        <option value="3" selected>3</option>
+        <option value="5">5</option>
+        <option value="8">8</option>
+      </select>
+      <label><input type="checkbox" id="sseLogRetry" /> Log retry SSE</label>
+    </div>
+    <div class="row">
+      <div style="flex:1">
+        <h3>Owner</h3>
+        <ul id="mineList" class="messages"></ul>
+      </div>
+      <div style="flex:1">
+        <h3>Iscritto</h3>
+        <ul id="subscribedList" class="messages"></ul>
+      </div>
+    </div>
+    <div class="row mb8">
+      <input id="unsubscribeEventId" placeholder="Event ID" />
+      <button id="unsubscribeBtn">Annulla Iscrizione</button>
+    </div>
+  </section>
+
+  <section id="sectionParticipant">
+    <h2>Partecipante</h2>
+    <div class="mb8">
+      <h3>Evento</h3>
+      <input id="eventIdInput" placeholder="Event ID" />
+      <div class="row mb8">
+        <button id="subscribeEventBtn">Sottoscrivi Evento</button>
+        <button id="unsubscribeEventSseBtn">Disiscrivi</button>
+        <span class="badge" id="eventSseRetry"></span>
+        <button id="registerBtn">Iscriviti Evento</button>
+      </div>
+    </div>
+    <div class="mb8">
+      <h3>Chat</h3>
+      <input id="messageInput" placeholder="Messaggio" />
+      <button id="sendMessageBtn">Invia Messaggio</button>
+    </div>
+    <div class="row mb8">
+      <button id="loadMessagesBtn">Carica Messaggi</button>
+      <label><input type="checkbox" id="autoRefresh" /> Auto Aggiorna</label>
+      <select id="refreshInterval">
+        <option value="5">5s</option>
+        <option value="10" selected>10s</option>
+        <option value="30">30s</option>
+      </select>
+    </div>
+    <div>
+      <ul id="messagesList" class="messages"></ul>
+    </div>
+  </section>
+
+  <section id="sectionReport">
+    <h2>Segnalazioni</h2>
+    <div class="row mb8">
+      <select id="reportTargetType"><option value="event">event</option><option value="message">message</option><option value="user">user</option></select>
+      <input id="reportTargetId" placeholder="Target ID" />
+      <input id="reportReason" placeholder="Motivo" />
+      <button id="reportSubmitBtn">Invia Segnalazione</button>
+    </div>
+  </section>
+
+  <section id="sectionAdmin">
+    <h2>Admin</h2>
+    <div class="mb8"><span id="adminStatus">non loggato</span></div>
+    <div class="mb8">
+      <h3>Notifiche Admin</h3>
+      <button id="subscribeAdminBtn">Sottoscrivi Notifiche Admin</button>
+      <button id="unsubscribeAdminSseBtn">Disiscrivi</button>
+      <span class="status"><span id="adminSseDot" class="dot"></span> <span id="adminSseText">offline</span> <span class="badge" id="adminSseRetry"></span></span>
+      <div class="row mb8">
+        <button id="listAdminNotificationsBtn">Lista Notifiche Admin</button>
+        <span class="badge">Non lette: <span id="adminNotifCount">0</span></span>
+        <button id="adminMarkAllReadBtn">Segna tutte come lette</button>
+      </div>
+      <div class="row mb8">
+        <input id="adminNotifFilter" placeholder="Filtro notifiche" />
+        <select id="adminNotifPageSize"><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option></select>
+        <button id="adminNotifPrev">Prev</button>
+        <button id="adminNotifNext">Next</button>
+        <span id="adminNotifPageInfo"></span>
+        <span class="badge">Totale filtrate: <span id="adminNotifTotal">0</span></span>
+        <button id="adminNotifExport">Esporta CSV</button>
+        <button id="adminNotifExportUnread">Esporta Non Lette</button>
+      </div>
+      <div class="row mb8">
+        <label><input type="checkbox" id="adminNotifAuto" /> Auto Aggiorna</label>
+        <select id="adminNotifInterval"><option value="5">5s</option><option value="10" selected>10s</option><option value="30">30s</option></select>
+      </div>
+      <ul id="adminNotifList" class="messages"></ul>
+    </div>
+    <div class="row mb8">
+      <button id="listUsersBtn">Lista Utenti</button>
+      <button id="listEventsBtn">Lista Eventi</button>
+      <button id="listReportsBtn">Lista Segnalazioni</button>
+    </div>
+    <div class="row">
+      <div style="flex:1">
+        <h3>Utenti</h3>
+        <ul id="adminUsersList" class="messages"></ul>
+      </div>
+      <div style="flex:1">
+        <h3>Eventi</h3>
+        <ul id="adminEventsList" class="messages"></ul>
+      </div>
+      <div style="flex:1">
+        <h3>Segnalazioni</h3>
+        <ul id="adminReportsList" class="messages"></ul>
+      </div>
+    </div>
+    <div>
+      <input id="promoteUserId" placeholder="User ID" />
+      <select id="promoteRole">
+        <option value="user">user</option>
+        <option value="admin">admin</option>
+      </select>
+      <button id="promoteBtn">Aggiorna Ruolo</button>
+    </div>
+    <div>
+      <input id="moderateEventId" placeholder="Event ID" />
+      <select id="moderateStatus">
+        <option value="draft">draft</option>
+        <option value="published">published</option>
+        <option value="archived">archived</option>
+      </select>
+      <button id="moderateBtn">Modera Evento</button>
+    </div>
+  </section>
+
+  <section id="sectionLog">
+    <h2>Log</h2>
+    <pre id="log"></pre>
+  </section>
+
+  <section id="sectionDocs">
+    <h2>API Docs</h2>
+    <div class="row mb8">
+      <button id="loadApiDocsBtn">Carica API Docs</button>
+      <select id="apiDocsMethodFilter">
+        <option value="">Tutti i metodi</option>
+        <option value="GET">GET</option>
+        <option value="POST">POST</option>
+        <option value="PUT">PUT</option>
+        <option value="DELETE">DELETE</option>
+      </select>
+      <select id="apiDocsRoleFilter">
+        <option value="">Tutti i ruoli</option>
+        <option value="public">public</option>
+        <option value="user">user</option>
+        <option value="owner">owner</option>
+        <option value="owner_or_participant">owner_or_participant</option>
+        <option value="admin">admin</option>
+      </select>
+      <input id="apiDocsPathQuery" placeholder="Cerca path (es. events)" />
+      <button id="apiDocsExportBtn">Esporta CSV</button>
+    </div>
+    <div id="apiDocsMeta"></div>
+    <table id="apiDocsTable" class="table"></table>
+  </section>
+
+  <div id="toast" class="toast" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    const logEl = document.getElementById('log');
+    function log(msg){ logEl.textContent += `\n${msg}`; logEl.scrollTop = logEl.scrollHeight; }
+    function showToast(msg){ const t = document.getElementById('toast'); const div = document.createElement('div'); div.className='toast-item'; div.textContent=msg; t.appendChild(div); setTimeout(()=>{ div.classList.add('hide'); setTimeout(()=>div.remove(), 400); }, 3000); }
+    function bind(id, handler){ const el = document.getElementById(id); if(el) el.onclick = handler; }
+
+    let ownerToken = null;
+    let ownerUser = null;
+    let userToken = null;
+    let userUser = null;
+    let eventId = null;
+    let adminToken = null;
+    let adminUser = null;
+    let adminNotifications = [];
+    let adminNotifPage = 0;
+    let adminNotifRefreshTimer = null;
+    let ownerSseClose = null;
+    let adminSseClose = null;
+    let eventSseClose = null;
+    async function precheckSse(url){
+      const ac = new AbortController();
+      try { const res = await fetch(url, { signal: ac.signal }); ac.abort(); return res.status; } catch (e) { try{ ac.abort(); }catch{} return 0; }
+    }
+    function subscribeWithRetry(url, onOpen, onMessage, onErrorUi, maxRetries, onRetryProgress){
+      let attempts = 0; let es = null;
+      async function tryOnce(){
+        const status = await precheckSse(url);
+        if(status === 401 || status === 403){ onErrorUi(); return; }
+        es = new EventSource(url);
+        es.onopen = onOpen;
+        es.onmessage = onMessage;
+        es.onerror = async () => {
+          if(es) es.close();
+          attempts++;
+          const domMax = Number(document.getElementById('sseMaxRetries')?.value || '3');
+          const maxR = (typeof maxRetries === 'number') ? maxRetries : domMax;
+          if(attempts > maxR){ onErrorUi(); return; }
+          const delay = Math.min(1000 * Math.pow(2, attempts-1), 8000);
+          const logRetry = !!document.getElementById('sseLogRetry')?.checked;
+          if(logRetry) log(`Retry SSE tra ${delay}ms (tentativo ${attempts}/${maxR})`);
+          if(typeof onRetryProgress === 'function') onRetryProgress(attempts, maxR, delay);
+          setTimeout(tryOnce, delay);
+        };
+      }
+      tryOnce();
+      return () => { if(es) es.close(); };
+    }
+    let apiDocsData = null;
+
+    function updateVisibility(){
+      const logged = !!(userToken || ownerToken || adminToken);
+      document.getElementById('sectionOwner').style.display = logged ? '' : 'none';
+      document.getElementById('sectionParticipant').style.display = logged ? '' : 'none';
+      document.getElementById('sectionDashboard').style.display = logged ? '' : 'none';
+      document.getElementById('sectionAdmin').style.display = adminToken ? '' : 'none';
+    }
+    updateVisibility();
+
+    bind('acctSignupBtn', async () => {
+      const email = (document.getElementById('acctEmail').value || '').trim();
+      const name = (document.getElementById('acctName').value || '').trim();
+      const password = (document.getElementById('acctPassword').value || '').trim();
+      if(!email || !name || password.length < 8){ log('Compila email, nome e password (min 8)'); return; }
+      const res = await fetch('/auth/signup', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, name, password }) });
+      log('Signup status: ' + res.status);
+    });
+    bind('acctLoginBtn', async () => {
+      const email = (document.getElementById('acctEmail').value || '').trim();
+      const password = (document.getElementById('acctPassword').value || '').trim();
+      if(!email || password.length < 8){ log('Compila email e password (min 8)'); return; }
+      const res = await fetch('/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, password }) });
+      const data = await res.json();
+      if(res.ok){
+        userToken = data.token; userUser = data.user;
+        ownerToken = data.token; ownerUser = data.user;
+        adminToken = data.user.role === 'admin' ? data.token : null;
+        adminUser = data.user.role === 'admin' ? data.user : null;
+        document.getElementById('acctStatus').textContent = `loggato: ${data.user.name} (${data.user.role})`;
+        document.getElementById('adminStatus').textContent = adminToken ? `loggato: ${data.user.name} (admin)` : 'non loggato';
+        updateVisibility();
+        log(`Login ok: ${data.user.id}`);
+      } else {
+        log('Login error: ' + JSON.stringify(data));
+      }
+    });
+    bind('acctLogoutBtn', () => {
+      userToken = null; userUser = null; ownerToken = null; ownerUser = null; adminToken = null; adminUser = null;
+      document.getElementById('acctStatus').textContent = 'non loggato';
+      document.getElementById('adminStatus').textContent = 'non loggato';
+      updateVisibility();
+      log('Logout eseguito');
+    });
+
+    const ownerSignupBtn = document.getElementById('ownerSignupBtn');
+    if(ownerSignupBtn) ownerSignupBtn.onclick = async () => {
+      const email = document.getElementById('ownerEmail').value;
+      const name = document.getElementById('ownerName').value || 'Owner';
+      const password = document.getElementById('ownerPassword').value;
+      const res = await fetch('/auth/signup', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, name, password }) });
+      log('Owner signup status: ' + res.status);
+    };
+
+    const ownerLoginBtn = document.getElementById('ownerLoginBtn');
+    if(ownerLoginBtn) ownerLoginBtn.onclick = async () => {
+      const email = document.getElementById('ownerEmail').value;
+      const password = document.getElementById('ownerPassword').value;
+      const res = await fetch('/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, password }) });
+      const data = await res.json();
+      if(res.ok){ ownerToken = data.token; ownerUser = data.user; log(`Owner login ok: ${ownerUser.id}`); } else { log(`Owner login error: ${JSON.stringify(data)}`); }
+    };
+
+    const ownerLoginContainer = document.getElementById('ownerLoginBtn');
+    if(ownerLoginContainer && !document.getElementById('googleLoginBtn')) ownerLoginContainer.insertAdjacentHTML('afterend', '<div class="mb8"><input id="googleIdToken" placeholder="Google ID token" /><button id="googleLoginBtn">Login con Google</button></div><div class="mb8"><input id="githubCode" placeholder="GitHub code" /><input id="githubAccessToken" placeholder="GitHub access token" /><button id="githubLoginBtn">Login con GitHub</button></div>');
+
+    bind('createEventBtn', async () => {
+      if(!ownerToken){ log('Owner non loggato'); return; }
+      const title = document.getElementById('eventTitle').value;
+      const city = document.getElementById('eventCity').value;
+      const description = (document.getElementById('eventDescription').value || '').trim();
+      const category = (document.getElementById('eventCategory').value || '').trim();
+      const capacityVal = (document.getElementById('eventCapacity').value || '').trim();
+      const startsAtInput = (document.getElementById('eventStartsAt').value || '').trim();
+      const endsAtInput = (document.getElementById('eventEndsAt').value || '').trim();
+      const imageUrlRaw = (document.getElementById('eventImageUrl').value || '').trim();
+      if(!title || !description || !category || !city){ log('Compila titolo, descrizione, categoria e città'); showToast('Compila i campi obbligatori'); return; }
+      if(!startsAtInput){ log('Data inizio obbligatoria'); showToast('Inserisci la data di inizio'); return; }
+      const startsAt = new Date(startsAtInput).getTime();
+      if(Number.isNaN(startsAt)){ log('Data inizio non valida'); showToast('Data inizio non valida'); return; }
+      let endsAt = null;
+      if(endsAtInput){ endsAt = new Date(endsAtInput).getTime(); if(Number.isNaN(endsAt)){ log('Data fine non valida'); showToast('Data fine non valida'); return; } }
+      let imageUrl = null;
+      if(imageUrlRaw){ try { new URL(imageUrlRaw); imageUrl = imageUrlRaw; } catch { log('URL immagine non valido'); showToast('URL immagine non valido'); return; } }
+      let capacity = null;
+      if(capacityVal){ const c = Number(capacityVal); if(!Number.isInteger(c) || c <= 0){ log('Capienza deve essere un intero positivo'); showToast('Capienza non valida'); return; } capacity = c; }
+      const payload = { title, description, category, city, startsAt, status:'published' };
+      if(imageUrl !== null) payload.imageUrl = imageUrl;
+      if(capacity !== null && !Number.isNaN(capacity)) payload.capacity = capacity;
+      if(endsAt !== null) payload.endsAt = endsAt;
+      const res = await fetch('/events', { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization': 'Bearer ' + ownerToken }, body: JSON.stringify(payload) });
+      const data = await res.json();
+      if(res.ok){
+        eventId = data.id;
+        document.getElementById('createdEventId').textContent = eventId;
+        const evInput = document.getElementById('eventIdInput');
+        const ownerEvInput = document.getElementById('ownerEventIdInput');
+        const reportTargetIdInput = document.getElementById('reportTargetId');
+        if(evInput) evInput.value = eventId;
+        if(ownerEvInput) ownerEvInput.value = eventId;
+        if(reportTargetIdInput) reportTargetIdInput.value = eventId;
+        log(`Evento creato: ${eventId}`);
+      } else {
+        log(`Errore creazione evento: ${JSON.stringify(data)}`);
+      }
+    });
+
+    bind('subscribeOwnerBtn', () => {
+      if(!ownerUser){ log('Owner non loggato'); return; }
+      const url = '/realtime/users/' + ownerUser.id + '?token=' + encodeURIComponent(ownerToken);
+      if(ownerSseClose) { try{ ownerSseClose(); }catch{} ownerSseClose = null; }
+      ownerSseClose = subscribeWithRetry(
+        url,
+        () => { document.getElementById('ownerSseDot').className = 'dot online'; document.getElementById('ownerSseText').textContent = 'online'; const el=document.getElementById('ownerSseRetry'); if(el) el.textContent=''; },
+        e => { log(`Realtime owner: ${e.data}`); try { const d = JSON.parse(e.data); if(d.type === 'notification'){ updateNotifCount(); showToast(d.content); } } catch {} },
+        () => { document.getElementById('ownerSseDot').className = 'dot offline'; document.getElementById('ownerSseText').textContent = 'offline'; const el=document.getElementById('ownerSseRetry'); if(el) el.textContent=''; showToast('SSE utente non disponibile: token invalido o utente bloccato'); },
+        undefined,
+        (attempts, maxR, delay) => { const el=document.getElementById('ownerSseRetry'); if(el) el.textContent = `retry ${attempts}/${maxR} in ${Math.round(delay)}ms`; document.getElementById('ownerSseDot').className = 'dot retry'; document.getElementById('ownerSseText').textContent = 'retry…'; }
+      );
+      log('Sottoscritto notifiche owner');
+    });
+    bind('unsubscribeOwnerSseBtn', () => { if(ownerSseClose){ try{ ownerSseClose(); }catch{} ownerSseClose = null; } document.getElementById('ownerSseDot').className = 'dot offline'; document.getElementById('ownerSseText').textContent = 'offline'; const el=document.getElementById('ownerSseRetry'); if(el) el.textContent=''; log('Sottoscrizione owner chiusa'); });
+
+    bind('listNotificationsBtn', async () => {
+      if(!ownerToken){ log('Owner non loggato'); return; }
+      const res = await fetch('/notifications', { headers:{ 'Authorization':'Bearer ' + ownerToken } });
+      const data = await res.json();
+      log('Notifiche: ' + JSON.stringify(data));
+      const unread = Array.isArray(data) ? data.filter(n => !n.read).length : 0;
+      document.getElementById('notifCount').textContent = String(unread);
+    });
+
+    bind('markAllReadBtn', async () => {
+      if(!ownerToken){ log('Owner non loggato'); return; }
+      const res = await fetch('/notifications/read-all', { method:'PUT', headers:{ 'Authorization':'Bearer ' + ownerToken } });
+      if(res.ok){ showToast('Tutte le notifiche segnate come lette'); updateNotifCount(); } else { log('Errore segna tutte'); }
+    });
+
+    async function updateNotifCount(){
+      if(!ownerToken) return;
+      const res = await fetch('/notifications', { headers:{ 'Authorization':'Bearer ' + ownerToken } });
+      const data = await res.json();
+      const unread = Array.isArray(data) ? data.filter(n => !n.read).length : 0;
+      document.getElementById('notifCount').textContent = String(unread);
+    }
+
+    bind('subscribeAdminBtn', () => {
+      if(!adminUser){ log('Admin non loggato'); return; }
+      const url = '/realtime/users/' + adminUser.id + '?token=' + encodeURIComponent(adminToken);
+      if(adminSseClose) { try{ adminSseClose(); }catch{} adminSseClose = null; }
+      adminSseClose = subscribeWithRetry(
+        url,
+        () => { document.getElementById('adminSseDot').className = 'dot online'; document.getElementById('adminSseText').textContent = 'online'; const el=document.getElementById('adminSseRetry'); if(el) el.textContent=''; },
+        e => { log('Realtime admin: ' + e.data); try { const d = JSON.parse(e.data); if(d.type === 'notification'){ updateAdminNotifCount(); (async()=>{ const res2 = await fetch('/notifications', { headers:{ 'Authorization':'Bearer ' + adminToken } }); adminNotifications = await res2.json(); adminNotifPage = 0; renderAdminNotifications(); })(); showToast(d.content); } } catch {} },
+        () => { document.getElementById('adminSseDot').className = 'dot offline'; document.getElementById('adminSseText').textContent = 'offline'; const el=document.getElementById('adminSseRetry'); if(el) el.textContent=''; showToast('SSE utente non disponibile: token invalido o utente bloccato'); },
+        undefined,
+        (attempts, maxR, delay) => { const el=document.getElementById('adminSseRetry'); if(el) el.textContent = `retry ${attempts}/${maxR} in ${Math.round(delay)}ms`; document.getElementById('adminSseDot').className = 'dot retry'; document.getElementById('adminSseText').textContent = 'retry…'; }
+      );
+      log('Sottoscritto notifiche admin');
+    });
+    bind('unsubscribeAdminSseBtn', () => { if(adminSseClose){ try{ adminSseClose(); }catch{} adminSseClose = null; } document.getElementById('adminSseDot').className = 'dot offline'; document.getElementById('adminSseText').textContent = 'offline'; const el=document.getElementById('adminSseRetry'); if(el) el.textContent=''; log('Sottoscrizione admin chiusa'); });
+
+    bind('listAdminNotificationsBtn', async () => {
+      if(!adminToken){ log('Admin non loggato'); return; }
+      const res = await fetch('/notifications', { headers:{ 'Authorization':'Bearer ' + adminToken } });
+      adminNotifications = await res.json();
+      log('Notifiche admin: ' + JSON.stringify(adminNotifications));
+      const unread = Array.isArray(adminNotifications) ? adminNotifications.filter(n => !n.read).length : 0;
+      document.getElementById('adminNotifCount').textContent = String(unread);
+      adminNotifPage = 0;
+      renderAdminNotifications();
+    });
+
+    bind('adminMarkAllReadBtn', async () => {
+      if(!adminToken){ log('Admin non loggato'); return; }
+      const res = await fetch('/notifications/read-all', { method:'PUT', headers:{ 'Authorization':'Bearer ' + adminToken } });
+      if(res.ok){ showToast('Tutte le notifiche admin segnate come lette'); updateAdminNotifCount(); } else { log('Errore segna tutte admin'); }
+    });
+
+    async function updateAdminNotifCount(){
+      if(!adminToken) return;
+      const res = await fetch('/notifications', { headers:{ 'Authorization':'Bearer ' + adminToken } });
+      const data = await res.json();
+      const unread = Array.isArray(data) ? data.filter(n => !n.read).length : 0;
+      document.getElementById('adminNotifCount').textContent = String(unread);
+    }
+
+    function renderAdminNotifications(){
+      const q = (document.getElementById('adminNotifFilter').value || '').toLowerCase();
+      const pageSize = Number(document.getElementById('adminNotifPageSize').value || '10');
+      const filtered = Array.isArray(adminNotifications) ? adminNotifications.filter(n => (String(n.content||'').toLowerCase().includes(q)) || (String(n.type||'').toLowerCase().includes(q))) : [];
+      const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+      if(adminNotifPage >= totalPages) adminNotifPage = totalPages - 1;
+      if(adminNotifPage < 0) adminNotifPage = 0;
+      const start = adminNotifPage * pageSize;
+      const pageItems = filtered.slice(start, start + pageSize);
+      document.getElementById('adminNotifList').innerHTML = pageItems.map(n => `<li data-id="${n.id}">${n.type}: ${escapeHtml(String(n.content||''))} <small>${new Date(n.createdAt).toLocaleString()}${n.read ? '' : ' (nuova)'}</small> <button class="markReadBtn" ${n.read ? 'disabled' : ''}>Leggi</button></li>`).join('');
+      document.getElementById('adminNotifPageInfo').textContent = `Pagina ${adminNotifPage+1}/${totalPages}`;
+      document.getElementById('adminNotifTotal').textContent = String(filtered.length);
+      Array.from(document.querySelectorAll('#adminNotifList .markReadBtn')).forEach(btn => {
+        btn.onclick = async () => {
+          const id = btn.parentElement.getAttribute('data-id');
+          if(!adminToken || !id) return;
+          const res = await fetch(`/notifications/${id}/read`, { method:'PUT', headers:{ 'Authorization':'Bearer ' + adminToken } });
+          if(res.ok){
+            const item = adminNotifications.find(n => String(n.id) === String(id));
+            if(item) item.read = true;
+            updateAdminNotifCount();
+            renderAdminNotifications();
+          }
+        };
+      });
+    }
+
+    bind('adminNotifPrev', () => { adminNotifPage = Math.max(0, adminNotifPage - 1); renderAdminNotifications(); });
+    bind('adminNotifNext', () => { adminNotifPage = adminNotifPage + 1; renderAdminNotifications(); });
+    document.getElementById('adminNotifFilter').oninput = () => { adminNotifPage = 0; renderAdminNotifications(); };
+    document.getElementById('adminNotifPageSize').onchange = () => { adminNotifPage = 0; renderAdminNotifications(); };
+    bind('adminNotifExport', () => {
+      const q = (document.getElementById('adminNotifFilter').value || '').toLowerCase();
+      const filtered = Array.isArray(adminNotifications) ? adminNotifications.filter(n => (String(n.content||'').toLowerCase().includes(q)) || (String(n.type||'').toLowerCase().includes(q))) : [];
+      const rows = [ ['id','type','content','createdAt','read','eventId','userId'], ...filtered.map(n => [ String(n.id), String(n.type||''), String(n.content||'').replace(/"/g,'""'), new Date(n.createdAt).toISOString(), String(!!n.read), String(n.eventId || ''), String(n.userId || '') ]) ];
+      const csv = rows.map(r => r.map(f => '"' + f + '"').join(',')).join('\n');
+      const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'admin-notifiche.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+    bind('adminNotifExportUnread', () => {
+      const q = (document.getElementById('adminNotifFilter').value || '').toLowerCase();
+      const filtered = Array.isArray(adminNotifications) ? adminNotifications.filter(n => !n.read && ((String(n.content||'').toLowerCase().includes(q)) || (String(n.type||'').toLowerCase().includes(q)))) : [];
+      const rows = [ ['id','type','content','createdAt','read','eventId','userId'], ...filtered.map(n => [ String(n.id), String(n.type||''), String(n.content||'').replace(/"/g,'""'), new Date(n.createdAt).toISOString(), String(!!n.read), String(n.eventId || ''), String(n.userId || '') ]) ];
+      const csv = rows.map(r => r.map(f => '"' + f + '"').join(',')).join('\n');
+      const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'admin-notifiche-unread.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+    function startAdminAutoRefresh(){
+      const secs = Number(document.getElementById('adminNotifInterval').value || '10');
+      stopAdminAutoRefresh();
+      adminNotifRefreshTimer = setInterval(async () => {
+        if(!adminToken) return;
+        const res = await fetch('/notifications', { headers:{ 'Authorization':'Bearer ' + adminToken } });
+        adminNotifications = await res.json();
+        renderAdminNotifications();
+        updateAdminNotifCount();
+      }, secs * 1000);
+      log(`Auto refresh notifiche admin ogni ${secs}s`);
+    }
+    function stopAdminAutoRefresh(){ if(adminNotifRefreshTimer){ clearInterval(adminNotifRefreshTimer); adminNotifRefreshTimer = null; log('Auto refresh notifiche admin disattivato'); } }
+    document.getElementById('adminNotifAuto').onchange = () => { document.getElementById('adminNotifAuto').checked ? startAdminAutoRefresh() : stopAdminAutoRefresh(); };
+    document.getElementById('adminNotifInterval').onchange = () => { if(document.getElementById('adminNotifAuto').checked) startAdminAutoRefresh(); };
+
+    function renderApiDocs(){
+      const method = (document.getElementById('apiDocsMethodFilter').value || '').toUpperCase();
+      const role = (document.getElementById('apiDocsRoleFilter').value || '');
+      const q = (document.getElementById('apiDocsPathQuery').value || '').toLowerCase();
+      const items = Array.isArray(apiDocsData?.endpoints) ? apiDocsData.endpoints.filter(e => {
+        const mOk = !method || String(e.method).toUpperCase() === method;
+        const rOk = !role || String(e.role) === role;
+        const qOk = !q || String(e.path).toLowerCase().includes(q);
+        return mOk && rOk && qOk;
+      }) : [];
+      const rows = items.map(e => `<tr><td>${e.method}</td><td>${e.path}</td><td>${e.role}</td><td>${Array.isArray(e.query)? e.query.join(',') : ''}</td></tr>`).join('');
+      document.getElementById('apiDocsTable').innerHTML = `<thead><tr><th>Metodo</th><th>Path</th><th>Ruolo</th><th>Query</th></tr></thead><tbody>${rows}</tbody>`;
+    }
+
+    bind('loadApiDocsBtn', async () => {
+      try {
+        const res = await fetch('/api-docs');
+        apiDocsData = await res.json();
+        document.getElementById('apiDocsMeta').textContent = `${apiDocsData.name} v${apiDocsData.version}`;
+        renderApiDocs();
+        log('API Docs caricati');
+      } catch (err) {
+        log('Errore API Docs');
+      }
+    });
+    document.getElementById('apiDocsMethodFilter').onchange = () => renderApiDocs();
+    document.getElementById('apiDocsRoleFilter').onchange = () => renderApiDocs();
+    document.getElementById('apiDocsPathQuery').oninput = () => renderApiDocs();
+    bind('apiDocsExportBtn', () => {
+      const method = (document.getElementById('apiDocsMethodFilter').value || '').toUpperCase();
+      const role = (document.getElementById('apiDocsRoleFilter').value || '');
+      const q = (document.getElementById('apiDocsPathQuery').value || '').toLowerCase();
+      const items = Array.isArray(apiDocsData?.endpoints) ? apiDocsData.endpoints.filter(e => {
+        const mOk = !method || String(e.method).toUpperCase() === method;
+        const rOk = !role || String(e.role) === role;
+        const qOk = !q || String(e.path).toLowerCase().includes(q);
+        return mOk && rOk && qOk;
+      }) : [];
+      const rows = [ ['method','path','role','query'], ...items.map(e => [ e.method, e.path, e.role, Array.isArray(e.query)? e.query.join('|') : '' ]) ];
+      const csv = rows.map(r => r.map(f => '"' + String(f).replace(/"/g,'""') + '"').join(',')).join('\n');
+      const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'api-docs.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    // Owner: lista messaggi
+    const ownerMessagesList = document.getElementById('ownerMessagesList');
+    function renderOwnerMessages(items){ ownerMessagesList.innerHTML = items.map(m => `<li><strong>${m.user.name}</strong>: ${escapeHtml(m.content)} <small>${new Date(m.createdAt).toLocaleString()}</small></li>`).join(''); }
+    bind('ownerLoadMessagesBtn', async () => {
+      const id = document.getElementById('ownerEventIdInput').value;
+      if(!id){ log('Event ID mancante (owner)'); return; }
+      const token = ownerToken || userToken || adminToken;
+      if(!token){ log('Utente non loggato'); return; }
+      const res = await fetch(`/events/${id}/messages`, { headers:{ 'Authorization':'Bearer ' + token } });
+      const data = await res.json();
+      if(res.ok){ renderOwnerMessages(data); log('Messaggi owner caricati: ' + data.length); } else { log('Errore caricamento owner: ' + JSON.stringify(data)); }
+    });
+
+    const userSignupBtn = document.getElementById('userSignupBtn');
+    if(userSignupBtn) userSignupBtn.onclick = async () => {
+      const email = document.getElementById('userEmail').value;
+      const name = document.getElementById('userName').value;
+      const password = document.getElementById('userPassword').value;
+      const res = await fetch('/auth/signup', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, name, password }) });
+      log('Signup status: ' + res.status);
+    };
+
+    const userLoginBtn = document.getElementById('userLoginBtn');
+    if(userLoginBtn) userLoginBtn.onclick = async () => {
+      const email = document.getElementById('userEmail').value;
+      const password = document.getElementById('userPassword').value;
+      const res = await fetch('/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, password }) });
+      const data = await res.json();
+      if(res.ok){ userToken = data.token; userUser = data.user; setEmailVerified(data.user); renderVerifyBanner(); log(`User login ok: ${userUser.id}`); } else { log(`User login error: ${JSON.stringify(data)}`); }
+    };
+
+    const userLoginContainer = document.getElementById('userLoginBtn');
+    if(userLoginContainer) userLoginContainer.insertAdjacentHTML('afterend', '<div class="mb8"><input id="googleIdToken" placeholder="Google ID token" /><button id="googleLoginBtn">Login con Google</button></div><div class="mb8"><input id="githubCode" placeholder="GitHub code" /><input id="githubAccessToken" placeholder="GitHub access token" /><button id="githubLoginBtn">Login con GitHub</button></div><div class="mb8"><span id="emailVerifiedLabel">Email verificata: n/d</span></div>');
+    bind('googleLoginBtn', async () => {
+      const idToken = (document.getElementById('googleIdToken').value || '').trim();
+      if(!idToken){ showToast('Inserisci Google ID token'); return; }
+      const res = await fetch('/auth/oauth/google', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ idToken }) });
+      const data = await res.json();
+      if(res.ok){
+        if(data.user.role === 'admin'){ adminToken = data.token; adminUser = data.user; }
+        else { userToken = data.token; userUser = data.user; ownerToken = data.token; ownerUser = data.user; }
+        setEmailVerified(data.user);
+        try { if(typeof updateVisibility === 'function') updateVisibility(); } catch {}
+        renderVerifyBanner();
+        log(`OAuth Google ok: ${data.user.id}`);
+      } else { log('OAuth Google error: ' + JSON.stringify(data)); }
+    });
+    bind('githubLoginBtn', async () => {
+      const code = (document.getElementById('githubCode').value || '').trim();
+      const accessToken = (document.getElementById('githubAccessToken').value || '').trim();
+      const body = accessToken ? { accessToken } : { code };
+      if(!body.code && !body.accessToken){ showToast('Inserisci code o access token'); return; }
+      const res = await fetch('/auth/oauth/github', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+      const data = await res.json();
+      if(res.ok){
+        if(data.user.role === 'admin'){ adminToken = data.token; adminUser = data.user; }
+        else { userToken = data.token; userUser = data.user; ownerToken = data.token; ownerUser = data.user; }
+        setEmailVerified(data.user);
+        try { if(typeof updateVisibility === 'function') updateVisibility(); } catch {}
+        renderVerifyBanner();
+        log(`OAuth GitHub ok: ${data.user.id}`);
+      } else { log('OAuth GitHub error: ' + JSON.stringify(data)); }
+    });
+
+    function setEmailVerified(u){ const el = document.getElementById('emailVerifiedLabel'); if(!el) return; el.textContent = 'Email verificata: ' + (u && u.emailVerified ? 'sì' : 'no'); }
+    function renderVerifyBanner(){
+      const dash = document.getElementById('sectionDashboard');
+      if(!dash) return;
+      let u = userUser || ownerUser || adminUser;
+      let emailVerified = !!(u && u.emailVerified);
+      let banner = document.getElementById('verifyBanner');
+      if(emailVerified){ if(banner) banner.remove(); return; }
+      if(!banner){
+        banner = document.createElement('div');
+        banner.id = 'verifyBanner';
+        banner.className = 'mb8';
+        banner.innerHTML = '<div class="alert">Per continuare, verifica la tua email. <button id="verifyNowBtn">Verifica ora</button></div>';
+        dash.insertBefore(banner, dash.firstChild);
+        document.getElementById('verifyNowBtn').onclick = async () => {
+          try {
+            const email = (u && u.email) || (document.getElementById('verifyEmail')?.value || '').trim();
+            if(!email){ showToast('Email mancante'); return; }
+            const res = await fetch('/auth/verify/request', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
+            const data = await res.json().catch(()=>({}));
+            if(res.ok){ showToast('Verifica inviata'); const vt = document.getElementById('verifyToken'); const ve = document.getElementById('verifyEmail'); if(vt && data.token) vt.value = data.token; if(ve) ve.value = email; } else { log('Errore verifica: ' + JSON.stringify(data)); }
+          } catch (err) { log('Errore richiesta verifica'); }
+        };
+      }
+    }
+
+    bind('subscribeEventBtn', () => {
+      const id = document.getElementById('eventIdInput').value;
+      if(!id){ log('Event ID mancante'); return; }
+      const token = userToken || ownerToken || adminToken;
+      if(!token){ log('Token mancante'); return; }
+      const url = '/realtime/events/' + id + '?token=' + encodeURIComponent(token);
+      if(eventSseClose) { try{ eventSseClose(); }catch{} eventSseClose = null; }
+      eventSseClose = subscribeWithRetry(
+        url,
+        () => {},
+        e => { log(`Realtime evento: ${e.data}`); try { const d = JSON.parse(e.data); if(d.type === 'message') { addMessageToList(d); showToast(`${d.user?.name || 'user'}: ${d.content}`); } if(d.type === 'registration') { addInfoToList(`Nuova iscrizione: ${d.userName || d.userId}`); showToast(`Nuova iscrizione all'evento`); } if(d.type === 'registration_canceled') { addInfoToList('Iscrizione annullata'); showToast('Iscrizione annullata'); } } catch {} },
+        () => { showToast('SSE evento non disponibile'); const el=document.getElementById('eventSseRetry'); if(el) el.textContent=''; },
+        undefined,
+        (attempts, maxR, delay) => { const el=document.getElementById('eventSseRetry'); if(el) el.textContent = `retry ${attempts}/${maxR} in ${Math.round(delay)}ms`; }
+      );
+      log('Sottoscritto evento ' + id);
+    });
+    bind('unsubscribeEventSseBtn', () => { if(eventSseClose){ try{ eventSseClose(); }catch{} eventSseClose = null; } const el=document.getElementById('eventSseRetry'); if(el) el.textContent=''; log('Sottoscrizione evento chiusa'); });
+
+    bind('registerBtn', async () => {
+      const id = document.getElementById('eventIdInput').value;
+      if(!userToken){ log('Utente non loggato'); return; }
+      const res = await fetch(`/events/${id}/registrations`, { method:'POST', headers:{ 'Authorization':'Bearer ' + userToken } });
+      const data = await res.json();
+      if(res.ok){ log('Registrazione ok: ' + data.id); } else { log('Errore registrazione: ' + JSON.stringify(data)); }
+    });
+
+    bind('sendMessageBtn', async () => {
+      const id = document.getElementById('eventIdInput').value;
+      const content = document.getElementById('messageInput').value;
+      if(!userToken && !ownerToken){ log('Utente non loggato'); return; }
+      const res = await fetch(`/events/${id}/messages`, { method:'POST', headers:{ 'Authorization':'Bearer ' + userToken, 'Content-Type':'application/json' }, body: JSON.stringify({ content }) });
+      const data = await res.json();
+      if(res.ok){ log('Messaggio inviato: ' + data.id); } else { log('Errore messaggio: ' + JSON.stringify(data)); }
+    });
+
+    const messagesList = document.getElementById('messagesList');
+    let currentMessages = [];
+    function renderMessages(items){
+      messagesList.innerHTML = items.map(m => `<li><strong>${m.user.name}</strong>: ${escapeHtml(m.content)} <small>${new Date(m.createdAt).toLocaleString()}</small></li>`).join('');
+    }
+    function addMessageToList(m){
+      const li = document.createElement('li');
+      li.innerHTML = `<strong>${m.user?.name || 'user'}</strong>: ${escapeHtml(m.content)} <small>${new Date(m.createdAt).toLocaleString()}</small>`;
+      messagesList.appendChild(li);
+      currentMessages.push(m);
+    }
+    function addInfoToList(text){
+      const li = document.createElement('li');
+      li.textContent = text;
+      messagesList.appendChild(li);
+    }
+    function escapeHtml(str){ return str.replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[s])); }
+
+    async function loadMessages(){
+      const id = document.getElementById('eventIdInput').value;
+      if(!id){ log('Event ID mancante'); return; }
+      const token = userToken || ownerToken || adminToken;
+      if(!token){ log('Utente non loggato'); return; }
+      const res = await fetch(`/events/${id}/messages`, { headers:{ 'Authorization':'Bearer ' + token } });
+      const data = await res.json();
+      if(res.ok){ currentMessages = data; renderMessages(data); log('Messaggi caricati: ' + data.length); } else { log('Errore caricamento: ' + JSON.stringify(data)); }
+    }
+    bind('loadMessagesBtn', loadMessages);
+
+    let refreshTimer = null;
+    const autoRefreshEl = document.getElementById('autoRefresh');
+    const refreshIntervalEl = document.getElementById('refreshInterval');
+    function startAutoRefresh(){
+      const secs = Number(refreshIntervalEl.value || '10');
+      stopAutoRefresh();
+      refreshTimer = setInterval(loadMessages, secs * 1000);
+      log(`Auto refresh attivo ogni ${secs}s`);
+    }
+    function stopAutoRefresh(){ if(refreshTimer){ clearInterval(refreshTimer); refreshTimer = null; log('Auto refresh disattivato'); } }
+    autoRefreshEl.onchange = () => { autoRefreshEl.checked ? startAutoRefresh() : stopAutoRefresh(); };
+    refreshIntervalEl.onchange = () => { if(autoRefreshEl.checked) startAutoRefresh(); };
+
+    const adminLoginBtn = document.getElementById('adminLoginBtn');
+    if (adminLoginBtn) adminLoginBtn.onclick = async () => {
+      const email = document.getElementById('adminEmail').value;
+      const password = document.getElementById('adminPassword').value;
+      const res = await fetch('/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, password }) });
+      const data = await res.json();
+      if(res.ok){ adminToken = data.token; adminUser = data.user; log(`Admin login ok: ${data.user.id}`); updateVisibility(); } else { log(`Admin login error: ${JSON.stringify(data)}`); }
+    };
+    const adminLoginContainer = document.getElementById('adminLoginBtn');
+    if(adminLoginContainer && !document.getElementById('googleLoginBtn')) adminLoginContainer.insertAdjacentHTML('afterend', '<div class="mb8"><input id="googleIdToken" placeholder="Google ID token" /><button id="googleLoginBtn">Login con Google</button></div><div class="mb8"><input id="githubCode" placeholder="GitHub code" /><input id="githubAccessToken" placeholder="GitHub access token" /><button id="githubLoginBtn">Login con GitHub</button></div>');
+
+    bind('listUsersBtn', async () => {
+      if(!adminToken){ log('Admin non loggato'); return; }
+      const res = await fetch('/admin/users', { headers:{ 'Authorization':'Bearer ' + adminToken } });
+      const data = await res.json();
+      const el = document.getElementById('adminUsersList');
+      el.innerHTML = Array.isArray(data) ? data.map(u => `<li data-user-id="${u.id}"><strong>${u.name}</strong> <small>${u.email}</small> <span class="badge">${u.role}</span> <small>${new Date(u.createdAt).toLocaleString()}</small> <button class="copyUserIdBtn">Copia ID</button></li>`).join('') : '';
+      Array.from(el.querySelectorAll('.copyUserIdBtn')).forEach(btn => { const id = btn.parentElement.getAttribute('data-user-id'); btn.onclick = () => { const inp = document.getElementById('promoteUserId'); const blockInp = document.getElementById('blockUserId'); if(inp) inp.value = id; if(blockInp) blockInp.value = id; showToast('ID utente copiato'); }; });
+      log('Users: ' + (Array.isArray(data) ? data.length : 0));
+    });
+    bind('listEventsBtn', async () => {
+      if(!adminToken){ log('Admin non loggato'); return; }
+      const res = await fetch('/admin/events', { headers:{ 'Authorization':'Bearer ' + adminToken } });
+      const data = await res.json();
+      const el = document.getElementById('adminEventsList');
+      el.innerHTML = Array.isArray(data) ? data.map(e => `<li data-event-id="${e.id}"><strong>${e.title}</strong> - ${e.city} <small>${new Date(e.startsAt).toLocaleString()}</small> <span class="badge">${e.status}</span> <button class="copyEventIdBtn">Copia ID</button> <button class="reportEventBtn">Segnala</button></li>`).join('') : '';
+      Array.from(el.querySelectorAll('.copyEventIdBtn')).forEach(btn => { const id = btn.parentElement.getAttribute('data-event-id'); btn.onclick = () => { const modInp = document.getElementById('moderateEventId'); if(modInp) modInp.value = id; showToast('ID evento copiato'); }; });
+      wireReportButtons(el);
+      log('Events: ' + (Array.isArray(data) ? data.length : 0));
+    });
+    bind('listReportsBtn', async () => {
+      if(!adminToken){ log('Admin non loggato'); return; }
+      const res = await fetch('/admin/reports', { headers:{ 'Authorization':'Bearer ' + adminToken } });
+      const data = await res.json();
+      const el = document.getElementById('adminReportsList');
+      el.innerHTML = Array.isArray(data) ? data.map(r => `<li data-report-id="${r.id}">${r.targetType}: ${r.targetId} <small>${new Date(r.createdAt).toLocaleString()}</small> <span class="badge">${r.status}</span></li>`).join('') : '';
+      log('Reports: ' + (Array.isArray(data) ? data.length : 0));
+    });
+    bind('promoteBtn', async () => {
+      if(!adminToken){ log('Admin non loggato'); return; }
+      const id = document.getElementById('promoteUserId').value;
+      const role = document.getElementById('promoteRole').value;
+      const res = await fetch(`/admin/users/${id}/role`, { method:'PUT', headers:{ 'Authorization':'Bearer ' + adminToken, 'Content-Type':'application/json' }, body: JSON.stringify({ role }) });
+      log('Promote status: ' + res.status);
+    });
+    bind('moderateBtn', async () => {
+      if(!adminToken){ log('Admin non loggato'); return; }
+      const id = document.getElementById('moderateEventId').value;
+      const status = document.getElementById('moderateStatus').value;
+      const res = await fetch(`/admin/events/${id}/moderate`, { method:'PUT', headers:{ 'Authorization':'Bearer ' + adminToken, 'Content-Type':'application/json' }, body: JSON.stringify({ status }) });
+      log('Moderate status: ' + res.status);
+    });
+    // Filtro messaggi
+    const filterRow = document.createElement('div');
+    filterRow.className = 'row mb8';
+    filterRow.innerHTML = `
+      <input id="filterText" placeholder="Filtro (utente o testo)" />
+      <button id="applyFilterBtn">Applica Filtro</button>
+      <button id="clearFilterBtn">Pulisci Filtro</button>
+    `;
+    document.getElementById('sectionParticipant').appendChild(filterRow);
+    document.getElementById('applyFilterBtn').onclick = () => {
+      const q = document.getElementById('filterText').value.toLowerCase();
+      const filtered = currentMessages.filter(m => (m.user?.name || '').toLowerCase().includes(q) || (m.content || '').toLowerCase().includes(q));
+      renderMessages(filtered);
+    };
+    document.getElementById('clearFilterBtn').onclick = () => { renderMessages(currentMessages); document.getElementById('filterText').value = ''; };
+
+    const resetEmailEl = document.getElementById('resetEmail');
+    const resetTokenEl = document.getElementById('resetToken');
+    const resetNewPasswordEl = document.getElementById('resetNewPassword');
+    document.getElementById('resetRequestBtn').onclick = async () => {
+      const email = (resetEmailEl.value || '').trim();
+      if(!email){ log('Email mancante'); return; }
+      const res = await fetch('/auth/password-reset/request', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
+      const data = await res.json();
+      if(res.ok){ log('Reset richiesto'); if(data.token) { resetTokenEl.value = data.token; } } else { log('Errore reset: ' + JSON.stringify(data)); }
+    };
+    document.getElementById('resetConfirmBtn').onclick = async () => {
+      const email = (resetEmailEl.value || '').trim();
+      const token = (resetTokenEl.value || '').trim();
+      const password = (resetNewPasswordEl.value || '').trim();
+      const res = await fetch('/auth/password-reset/confirm', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, token, password }) });
+      const data = await res.json().catch(()=>({}));
+      if(res.ok){ showToast('Password aggiornata'); } else { log('Errore conferma: ' + JSON.stringify(data)); }
+    };
+
+    document.getElementById('resetConfirmBtn').insertAdjacentHTML('afterend', '<div class="mb8"><input id="verifyEmail" placeholder="Email" /><input id="verifyToken" placeholder="Token" /><button id="verifyRequestBtn">Richiedi Verifica</button><button id="verifyConfirmBtn">Conferma Verifica</button></div>');
+    const verifyEmailEl = document.getElementById('verifyEmail');
+    const verifyTokenEl = document.getElementById('verifyToken');
+    document.getElementById('verifyRequestBtn').onclick = async () => {
+      const email = (verifyEmailEl.value || '').trim();
+      if(!email){ log('Email mancante'); return; }
+      const res = await fetch('/auth/verify/request', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
+      const data = await res.json().catch(()=>({}));
+      if(res.ok){ log('Verifica richiesta'); if(data.token){ verifyTokenEl.value = data.token; } } else { log('Errore verifica: ' + JSON.stringify(data)); }
+    };
+    document.getElementById('verifyConfirmBtn').onclick = async () => {
+      const email = (verifyEmailEl.value || '').trim();
+      const token = (verifyTokenEl.value || '').trim();
+      if(!email || !token){ log('Email o token mancanti'); return; }
+      const res = await fetch('/auth/verify/confirm', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, token }) });
+      const data = await res.json().catch(()=>({}));
+      if(res.ok){ showToast('Email verificata'); setEmailVerified({ emailVerified: true }); renderVerifyBanner(); } else { log('Errore conferma verifica: ' + JSON.stringify(data)); }
+    };
+
+    const catalogListEl = document.getElementById('catalogList');
+    bind('catalogSearchBtn', async () => {
+      const params = new URLSearchParams();
+      const q = document.getElementById('catalogQ').value.trim();
+      const category = document.getElementById('catalogCategory').value.trim();
+      const city = document.getElementById('catalogCity').value.trim();
+      const dateFrom = document.getElementById('catalogDateFrom').value.trim();
+      const dateTo = document.getElementById('catalogDateTo').value.trim();
+      if(q) params.set('q', q);
+      if(category) params.set('category', category);
+      if(city) params.set('city', city);
+      if(dateFrom) params.set('dateFrom', dateFrom);
+      if(dateTo) params.set('dateTo', dateTo);
+      const res = await fetch('/events?' + params.toString());
+      const data = await res.json();
+      catalogListEl.innerHTML = Array.isArray(data) ? data.map(e => `<li data-event-id="${e.id}"><strong>${e.title}</strong> - ${e.city} <small>${new Date(e.startsAt).toLocaleString()}</small> <button class="copyIdBtn">Copia ID</button> <button class="reportEventBtn">Segnala</button></li>`).join('') : '';
+      Array.from(catalogListEl.querySelectorAll('.copyIdBtn')).forEach(btn => {
+        const id = btn.parentElement.getAttribute('data-event-id');
+        btn.onclick = () => { document.getElementById('eventIdInput').value = id; document.getElementById('unsubscribeEventId').value = id; const rt = document.getElementById('reportTargetId'); if(rt) rt.value = id; showToast('ID copiato'); };
+      });
+      wireReportButtons(catalogListEl);
+      log('Eventi catalogo: ' + (Array.isArray(data) ? data.length : 0));
+    });
+
+    const mineListEl = document.getElementById('mineList');
+    const subscribedListEl = document.getElementById('subscribedList');
+    bind('loadMineBtn', async () => {
+      if(!ownerToken){ log('Owner non loggato'); return; }
+      const res = await fetch('/events/mine', { headers:{ 'Authorization':'Bearer ' + ownerToken } });
+      const data = await res.json();
+      mineListEl.innerHTML = Array.isArray(data) ? data.map(e => `<li data-event-id="${e.id}"><strong>${e.title}</strong> - ${e.city} <small>${new Date(e.startsAt).toLocaleString()}</small> <button class="copyIdBtn">Copia ID</button> <button class="deleteEventBtn">Elimina</button> <button class="reportEventBtn">Segnala</button></li>`).join('') : '';
+      Array.from(mineListEl.querySelectorAll('.copyIdBtn')).forEach(btn => {
+        const id = btn.parentElement.getAttribute('data-event-id');
+        btn.onclick = () => {
+          const evInput = document.getElementById('eventIdInput');
+          const ownerEvInput = document.getElementById('ownerEventIdInput');
+          const unsubInput = document.getElementById('unsubscribeEventId');
+          const rt = document.getElementById('reportTargetId');
+          if(evInput) evInput.value = id;
+          if(ownerEvInput) ownerEvInput.value = id;
+          if(unsubInput) unsubInput.value = id;
+          if(rt) rt.value = id;
+          showToast('ID copiato');
+        };
+      });
+      wireReportButtons(mineListEl);
+      Array.from(mineListEl.querySelectorAll('.deleteEventBtn')).forEach(btn => {
+        const id = btn.parentElement.getAttribute('data-event-id');
+        btn.onclick = async () => {
+          if(!ownerToken){ log('Owner non loggato'); return; }
+          const ok = window.confirm('Confermi eliminazione evento?');
+          if(!ok) return;
+          const res2 = await fetch(`/events/${id}`, { method:'DELETE', headers:{ 'Authorization':'Bearer ' + ownerToken } });
+          if(res2.status === 204){ showToast('Evento eliminato'); btn.parentElement.remove(); } else { const data2 = await res2.json().catch(()=>({})); log('Errore elimina: ' + JSON.stringify(data2)); }
+        };
+      });
+      log('Miei eventi: ' + (Array.isArray(data) ? data.length : 0));
+    });
+    bind('loadSubscribedBtn', async () => {
+      if(!userToken){ log('Utente non loggato'); return; }
+      const res = await fetch('/events/subscribed', { headers:{ 'Authorization':'Bearer ' + userToken } });
+      const data = await res.json();
+      subscribedListEl.innerHTML = Array.isArray(data) ? data.map(e => `<li data-event-id="${e.id}"><strong>${e.title}</strong> - ${e.city} <small>${new Date(e.startsAt).toLocaleString()}</small> <button class="copyIdBtn">Copia ID</button> <button class="unsubscribeBtn">Annulla</button> <button class="reportEventBtn">Segnala</button></li>`).join('') : '';
+      Array.from(subscribedListEl.querySelectorAll('.copyIdBtn')).forEach(btn => {
+        const id = btn.parentElement.getAttribute('data-event-id');
+        btn.onclick = () => { document.getElementById('eventIdInput').value = id; document.getElementById('unsubscribeEventId').value = id; showToast('ID copiato'); };
+      });
+      wireReportButtons(subscribedListEl);
+      Array.from(subscribedListEl.querySelectorAll('.unsubscribeBtn')).forEach(btn => {
+        const id = btn.parentElement.getAttribute('data-event-id');
+        btn.onclick = async () => {
+          const token2 = userToken || ownerToken;
+          if(!token2){ log('Utente non loggato'); return; }
+          const res2 = await fetch(`/events/${id}/registrations/me`, { method:'DELETE', headers:{ 'Authorization':'Bearer ' + token2 } });
+          if(res2.status === 204){ showToast('Iscrizione annullata'); btn.parentElement.remove(); } else { const data2 = await res2.json().catch(()=>({})); log('Errore annulla: ' + JSON.stringify(data2)); }
+        };
+      });
+      log('Eventi iscritti: ' + (Array.isArray(data) ? data.length : 0));
+    });
+
+    async function handleReport(eventId){
+      const token = userToken || ownerToken || adminToken;
+      if(!token){ log('Utente non loggato'); return; }
+      
+      const reasonRaw = window.prompt('Motivo segnalazione (min 5)') || '';
+      const reason = reasonRaw.trim();
+      if(reason.length < 5){ showToast('Motivo non valido'); return; }
+      log(`Invio segnalazione evento ${eventId}`);
+      const res = await fetch('/reports', { method:'POST', headers:{ 'Authorization':'Bearer ' + token, 'Content-Type':'application/json' }, body: JSON.stringify({ targetType:'event', targetId:eventId, reason }) });
+      const data = await res.json().catch(()=>({}));
+      if(res.ok){ showToast('Segnalazione inviata'); log('Report id: ' + data.id); } else { log('Errore segnalazione: ' + JSON.stringify(data)); }
+    }
+    function wireReportButtons(root){ Array.from(root.querySelectorAll('.reportEventBtn')).forEach(btn => { const id = btn.parentElement.getAttribute('data-event-id'); btn.onclick = () => handleReport(id); }); }
+
+    bind('reportSubmitBtn', async () => {
+      const token = userToken || ownerToken || adminToken;
+      if(!token){ log('Utente non loggato'); return; }
+      const targetType = document.getElementById('reportTargetType').value;
+      let targetId = (document.getElementById('reportTargetId').value || '').trim();
+      const reason = (document.getElementById('reportReason').value || '').trim();
+      if(targetType === 'event' && !targetId){
+        const candidates = [ '#eventIdInput', '#ownerEventIdInput', '#unsubscribeEventId' ];
+        for(const sel of candidates){ const el = document.querySelector(sel); if(el && el.value){ targetId = el.value.trim(); if(targetId) break; } }
+        if(!targetId){ const li = document.querySelector('#mineList li[data-event-id], #subscribedList li[data-event-id], #catalogList li[data-event-id]'); if(li){ targetId = li.getAttribute('data-event-id') || ''; } }
+        if(targetId){ document.getElementById('reportTargetId').value = targetId; }
+      }
+      if(!targetId || reason.length < 5){ log('Compila Target ID e Motivo (min 5)'); return; }
+      const res = await fetch('/reports', { method:'POST', headers:{ 'Authorization':'Bearer ' + token, 'Content-Type':'application/json' }, body: JSON.stringify({ targetType, targetId, reason }) });
+      const data = await res.json().catch(()=>({}));
+      if(res.ok){ showToast('Segnalazione inviata'); log('Report id: ' + data.id); } else { log('Errore segnalazione: ' + JSON.stringify(data)); }
+    });
+
+    bind('unsubscribeBtn', async () => {
+      const token = userToken || ownerToken;
+      if(!token){ log('Utente non loggato'); return; }
+      const id = document.getElementById('unsubscribeEventId').value.trim();
+      if(!id){ log('Event ID mancante'); return; }
+      const res = await fetch(`/events/${id}/registrations/me`, { method:'DELETE', headers:{ 'Authorization':'Bearer ' + token } });
+      if(res.status === 204){
+        showToast('Iscrizione annullata');
+        const li = Array.from(subscribedListEl.querySelectorAll('li')).find(el => el.getAttribute('data-event-id') === id);
+        if(li) li.remove();
+      } else {
+        const data = await res.json().catch(()=>({}));
+        log('Errore annulla: ' + JSON.stringify(data));
+      }
+    });
+
+    bind('reportSubmitBtn', async () => {
+      const token = userToken || ownerToken || adminToken;
+      if(!token){ log('Utente non loggato'); return; }
+      const targetType = document.getElementById('reportTargetType').value;
+      const targetId = (document.getElementById('reportTargetId').value || '').trim();
+      const reason = (document.getElementById('reportReason').value || '').trim();
+      if(!targetId || reason.length < 5){ log('Compila Target ID e Motivo (min 5)'); return; }
+      const res = await fetch('/reports', { method:'POST', headers:{ 'Authorization':'Bearer ' + token, 'Content-Type':'application/json' }, body: JSON.stringify({ targetType, targetId, reason }) });
+      const data = await res.json().catch(()=>({}));
+      if(res.ok){ showToast('Segnalazione inviata'); log('Report id: ' + data.id); } else { log('Errore segnalazione: ' + JSON.stringify(data)); }
+    });
+
+    document.getElementById('promoteBtn').insertAdjacentHTML('afterend', '<div class="mb8"><input id="blockUserId" placeholder="User ID" /><select id="blockFlag"><option value="true">blocca</option><option value="false">sblocca</option></select><button id="blockBtn">Aggiorna Blocco</button></div>');
+    document.getElementById('blockBtn').onclick = async () => {
+      if(!adminToken){ log('Admin non loggato'); return; }
+      const id = document.getElementById('blockUserId').value.trim();
+      const blocked = document.getElementById('blockFlag').value === 'true';
+      const res = await fetch(`/admin/users/${id}/block`, { method:'PUT', headers:{ 'Authorization':'Bearer ' + adminToken, 'Content-Type':'application/json' }, body: JSON.stringify({ blocked }) });
+      log('Blocco status: ' + res.status);
+    };
+
+  </script>
+</body>
+</html>
