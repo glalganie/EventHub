@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const authRouter = require("./routes/auth");
@@ -27,7 +28,11 @@ app.use("/admin", adminRouter);
 app.get("/realtime/events/:id", subscribeEvent);
 app.get("/realtime/users/:id", subscribeUser);
 
-app.use(express.static("public"));
+const staticDir = path.join(__dirname, "..", "public");
+app.use(express.static(staticDir));
+app.get("/", (_req, res) => {
+  res.sendFile(path.join(staticDir, "index.html"));
+});
 
 app.get("/api-docs", (_req, res) => {
   res.json({

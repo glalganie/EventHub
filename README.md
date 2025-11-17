@@ -95,6 +95,31 @@ Consulta `GET /api-docs` in esecuzione per la lista completa. Alcuni esempi:
 - Avvia con `npm start` o tramite un process manager (PM2/systemd)
 - `PUBLIC_BASE_URL` deve puntare all’URL pubblico (per link in email e callback)
 
+### Deploy su Vercel
+
+Questa repo è pronta per Vercel.
+
+- File `vercel.json` definisce routing: API verso `api/index.js`, statici da `public/`
+- Funzione Node in `api/index.js` esporta l’handler Express con init di TypeORM
+
+Passi:
+
+1. Apri il link di creazione progetto: `https://vercel.com/new?email=glalganie.tchissambo%40edu-its.it&teamSlug=glalganies-projects`
+2. Importa la repository Git
+3. Imposta le Environment Variables (Production/Preview):
+   - `JWT_SECRET`
+   - `PUBLIC_BASE_URL` (es. l’URL vercel)
+   - MySQL: `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`
+   - OAuth (opzionale): `GOOGLE_CLIENT_ID`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
+   - Admin seed (opzionale): `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME`
+4. Deploy
+
+Note:
+
+- Le pagine statiche sono servite da `public/` (home: `/` → `public/index.html`)
+- Le chiamate API (es. `/auth/*`, `/events/*`, `/realtime/*`) sono gestite dalla funzione Node
+- Per MySQL in Vercel usa un DB gestito (es. PlanetScale/Neon/MySQL su cloud) e whitelista gli IP se necessario
+
 ### Note OAuth
 
 - Google: verifica `GOOGLE_CLIENT_ID` corrisponda al client usato per generare l’`id_token`
@@ -105,4 +130,3 @@ Consulta `GET /api-docs` in esecuzione per la lista completa. Alcuni esempi:
 1. MySQL in locale con db `eventhub`
 2. `.env` configurato come sopra
 3. `npm run dev` e apri `http://localhost:3001/`
-
